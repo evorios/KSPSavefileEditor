@@ -20,17 +20,12 @@ public class Parser {
 	/**
 	 * Constructor with contents as a String and not the filename
 	 * @param content content of a savefile
-	 * @param isContent uselsess, just to differ from Parser(String) constructor
 	 */
-	public Parser(String content, boolean isContent) {
+	public Parser(String content) {
 		if(content != null && content.length()>0){
 			mLines = new ArrayList<>(Arrays.asList(content.split("\\r?\\n")));
 			mLineCount = mLines.size();
 		}
-	}
-	
-	public Parser(String filename){
-		this(new File(filename));
 	}
 	
 	public Parser(File file) {
@@ -44,7 +39,7 @@ public class Parser {
 		if (br != null) {
 			try {
 				mLines = new ArrayList<>();
-				String line = "";
+				String line;
 				while ((line = br.readLine()) != null) {
 					mLines.add(line);
 				}
@@ -91,20 +86,7 @@ public class Parser {
 			
 			// entry or valid name possible
 			if(line.contains("=")){ // entry
-				String[] kv = line.split("=");
-				String key = "";
-				String value = "";
-				if(kv.length == 1){
-					key = kv[0].trim(); // it is allowed to have "key =" without a value
-				}
-				else if(kv.length > 1){
-					key = kv[0].trim(); 
-					value = kv[1].trim();
-				}
-				else{
-					throw new Exception("Couldn't split Entry at line "+mCurrentLine +": " +line);
-				}
-				Entry tmp = new Entry(null, key, value);
+				Entry tmp = parseKeyValue(null, line);
 				data.add(tmp);
 				
 				Logger.log("found entry, adding to data: " +tmp);
@@ -124,7 +106,7 @@ public class Parser {
 	public Node parse(boolean hasRootNode) throws Exception{
 		if(mLines != null && mLines.size()>0){
 			
-			Node n = null;
+			Node n;
 			ProgressScreen.updateProgressBar(0);
 			
 			long startTime = System.currentTimeMillis();
@@ -190,20 +172,7 @@ public class Parser {
 			}
 			else if(mode == 3){ // entry, new node or closing bracket
 				if(line.contains("=")){ // entry
-					String[] kv = line.split("=");
-					String key = "";
-					String value = "";
-					if(kv.length == 1){
-						key = kv[0].trim(); // it is allowed to have "key =" without a value
-					}
-					else if(kv.length > 1){
-						key = kv[0].trim(); 
-						value = kv[1].trim();
-					}
-					else{
-						throw new Exception("Couldn't split Entry at line "+mCurrentLine +": " +line);
-					}
-					Entry tmp = new Entry(currentNode, key, value);
+					Entry tmp = parseKeyValue(currentNode, line);
 					currentNode.addEntry(tmp);
 					
 					Logger.log("found entry, adding to currentNode: " +tmp);
@@ -227,7 +196,24 @@ public class Parser {
 		}
 		return currentNode;
 	}
-	
+
+	private Entry parseKeyValue(Node currentNode, String line) throws Exception {
+		String[] kv = line.split("=");
+		String key;
+		String value = "";
+		if(kv.length == 1){
+			key = kv[0].trim(); // it is allowed to have "key =" without a value
+		}
+		else if(kv.length > 1){
+			key = kv[0].trim(); 
+			value = kv[1].trim();
+		}
+		else{
+			throw new Exception("Couldn't split Entry at line "+mCurrentLine +": " +line);
+		}
+		return new Entry(currentNode, key, value);
+	}
+
 	private boolean isValidName(String line){
 		 Pattern pattern = Pattern.compile("[/A-Za-z0-9_-]*");
 		 Matcher matcher = pattern.matcher(line);

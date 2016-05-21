@@ -83,7 +83,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 
 		mRootNode = rootNode;
 		if(mRootNode != null){
-			mRootNode.isExpanded(true);
+			mRootNode.setExpanded(true);
 		}
 		mNodeTableModel = nodeTableModel;
 		mNodeTableModel.addChangeListener(this);
@@ -197,7 +197,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 	public ArrayList<TreePath> search(ArrayList<Node> nodes, String search){
 		
 		if(search != null && search.length() != 0 && nodes != null && nodes.size() > 0){
-			TreePath[] tp = null;
+			TreePath[] tp;
 			ArrayList<TreePath> results = new ArrayList<>();
 			for (Node node : nodes) {
 				tp = node.multiSearch(search);
@@ -215,7 +215,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		String search = JOptionPane.showInputDialog(null, "Please enter search term", "Search", JOptionPane.QUESTION_MESSAGE);
 		if(search != null && search.length() != 0){
 			TreePath[] paths = getSelectionPaths(); // get all selected paths
-			ArrayList<TreePath> results = new ArrayList<>();
+			ArrayList<TreePath> results;
 			if(paths != null && paths.length>0){
 				// search from selection
 				results = search(paths, search);
@@ -257,7 +257,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 	public void setRootNode(Node mRootNode) {
 		if(mRootNode!=null){
 			this.mRootNode = mRootNode;
-			mRootNode.isExpanded(true);
+			mRootNode.setExpanded(true);
 			mNodeTreeModel.setRootNode(mRootNode);
 		}
 	}
@@ -520,11 +520,9 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 					if (selection instanceof Entry) {
 						parent.removeEntry((Entry) selection);
 						onEntryRemoved((Entry) selection);
-						selection = null;
 					} else if (selection instanceof Node) {
 						parent.removeSubNode((Node) selection);
 						onNodeRemoved((Node) selection);
-						selection = null;
 					}
 				} else { // we are deleting the root node!
 					// TODO: delete the root node?
@@ -539,7 +537,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 			final TreePath path = getSelectionPath();
 			if (path != null) {
 				String data = (String) (Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor));
-				final Parser p = new Parser(data, true);
+				final Parser p = new Parser(data);
 				ProgressScreen.showProgress("Parsing clipboard data...", this);
 				ProgressScreen.updateProgressBar(0);
 				Thread th = new Thread(() -> {

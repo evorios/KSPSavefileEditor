@@ -54,11 +54,11 @@ public class NodeTreeModel implements TreeModel, TreeWillExpandListener {
 	public int getIndexOfChild(Object parent, Object child) {
 		if(parent!=null && child!=null && parent instanceof Node){
 			Node n = (Node)parent;
-			if(n.getSubNodes().contains(child)){
+			if(child instanceof Node && n.getSubNodes().contains(child)){
 				// subnode is child of parent
 				return n.getSubNodes().indexOf(child);
 			}
-			else if(n.getEntries().contains(child)){
+			else if(child instanceof Entry && n.getEntries().contains(child)){
 				// entry is child
 				return n.getEntries().indexOf(child);
 			}
@@ -121,7 +121,7 @@ public class NodeTreeModel implements TreeModel, TreeWillExpandListener {
 	}
 	
 	private TreeModelEvent getEvent(Node n){
-		ArrayList<Object> path = null;
+		ArrayList<Object> path;
 		if(n != null){
 			if(n.hasParent()){
 				path = n.getParentNode().getPathToRoot();
@@ -175,7 +175,7 @@ public class NodeTreeModel implements TreeModel, TreeWillExpandListener {
 		if(tp!=null){
 			TreeBaseNode lpc = (TreeBaseNode) tp.getLastPathComponent();
 			if(lpc!=null){
-				lpc.isExpanded(true);
+				lpc.setExpanded(true);
 			}
 		}
 	}

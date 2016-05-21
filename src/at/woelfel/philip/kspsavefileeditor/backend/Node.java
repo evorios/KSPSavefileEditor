@@ -20,7 +20,7 @@ public class Node extends TreeBaseNode {
 	
 	
 	public Node(String name, Node parent) {
-		mParentNode = parent;
+		super(parent);
 		mNodeName = name;
 		mEntries = new ArrayList<>();
 		mSubNodes = new ArrayList<>();
@@ -136,14 +136,14 @@ public class Node extends TreeBaseNode {
 	}
 	
 	public ArrayList<Object> getPathToRoot(){
-		
-		if(mParentNode==null){
+		final Node parent = getParentNode();
+		if(parent==null){
 			ArrayList<Object> path = new ArrayList<>();
 			path.add(this);
 			return path;
 		}
 		else{
-			ArrayList<Object> path = mParentNode.getPathToRoot();
+			ArrayList<Object> path = parent.getPathToRoot();
 			path.add(this);
 			return path;
 		}

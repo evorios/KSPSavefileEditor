@@ -4,28 +4,28 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 public class Settings {
-	protected static Preferences prefs;
-	protected static final String prefName="/at/woelfel/philip/ksp/savefileeditor";
+	private static Preferences preferences;
+	private static final String prefName = "/at/woelfel/philip/ksp/savefileeditor";
 	
 	public static final String PREF_KSP_DIR="ksp_dir";
-	
-	protected static void checkPrefs(){
-		if(prefs == null){
-			prefs = Preferences.userRoot().node(Settings.prefName);
+
+	private static void check() {
+		if (preferences == null) {
+			preferences = Preferences.userRoot().node(Settings.prefName);
 		}
 	}
 	
 	
 	public static String getString(String key, String defaultValue){
-		checkPrefs();
-		return prefs.get(key, defaultValue);
+		check();
+		return preferences.get(key, defaultValue);
 	}
 	
 	public static boolean setString(String key, String value){
-		checkPrefs();
-		prefs.put(key, value);
+		check();
+		preferences.put(key, value);
 		try {
-			prefs.flush();
+			preferences.flush();
 		} catch (BackingStoreException e) {
 			return false;
 		}

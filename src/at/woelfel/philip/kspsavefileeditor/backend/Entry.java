@@ -6,11 +6,11 @@ public class Entry extends TreeBaseNode{
 	private String mValue;
 	
 	public Entry() {
-		
+		super(null);
 	}
 	
 	public Entry(Node parentNode, String key, String value){
-		mParentNode = parentNode;
+		super(parentNode);
 		mKey = key;
 		mValue = value;
 	}

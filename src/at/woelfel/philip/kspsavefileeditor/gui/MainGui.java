@@ -34,7 +34,7 @@ import javafx.stage.*;
 public class MainGui extends JFrame implements ActionListener, ItemListener, TreeSelectionListener{
 	/*
 	 * TODO: search & replace:
-	 * 			gefundenen elemente anzeigen und dann mit checkboxen auswaehlen welche ersetzt werden sollen
+	 * Show found elements with checkboxes so user could select what elements should be replaced
 	 */
 	private FileChooser mFileChooser;
 	private DirectoryChooser mDirectoryChooser;

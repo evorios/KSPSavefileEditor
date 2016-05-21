@@ -4,15 +4,19 @@ package at.woelfel.philip.kspsavefileeditor.backend;
  * Dummy base class for Node and Entry.
  */
 public class TreeBaseNode {
-	protected Node mParentNode;
-	protected boolean mIsExpanded=false;
-	
-	public void isExpanded(boolean isExpanded){
-		mIsExpanded = isExpanded;
+	private Node mParentNode;
+	private boolean mExpanded = false;
+
+	public TreeBaseNode(Node parentNode) {
+		mParentNode = parentNode;
+	}
+
+	public void setExpanded(boolean isExpanded) {
+		mExpanded = isExpanded;
 	}
 	
 	public boolean isExpanded(){
-		return mIsExpanded;
+		return mExpanded;
 	}
 	
 	public Node getParentNode() {

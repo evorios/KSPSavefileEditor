@@ -14,23 +14,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.TreePath;
 
 import at.woelfel.philip.kspsavefileeditor.backend.Node;
@@ -38,6 +24,11 @@ import at.woelfel.philip.kspsavefileeditor.backend.NodeTableModel;
 import at.woelfel.philip.kspsavefileeditor.backend.Settings;
 import at.woelfel.philip.tools.Logger;
 import at.woelfel.philip.tools.Tools;
+import javafx.application.Platform;
+import javafx.embed.swing.JFXPanel;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.stage.*;
 
 @SuppressWarnings("serial")
 public class MainGui extends JFrame implements ActionListener, ItemListener, TreeSelectionListener{
@@ -45,7 +36,10 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 	 * TODO: search & replace:
 	 * 			gefundenen elemente anzeigen und dann mit checkboxen auswaehlen welche ersetzt werden sollen
 	 */
-	private JFileChooser mFileChooser;
+	private FileChooser mFileChooser;
+	private DirectoryChooser mDirectoryChooser;
+
+	private JFXPanel mJFXPanel;
 	
 	private JTabbedPane mTabPane;
 	private JTable mEntryTable;
@@ -69,11 +63,25 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 	
 	public MainGui() {
 		Logger.setEnabled(false);
-		
-		
-		mFileChooser = new JFileChooser(Settings.getString(Settings.PREF_KSP_DIR, System.getProperty("user.home")));
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("KSP Save or Craft files (sfs, txt, craft, cfg)", "sfs", "txt", "craft", "cfg");
-		mFileChooser.setFileFilter(filter);
+
+		mJFXPanel = new JFXPanel();
+		add(mJFXPanel);
+		mJFXPanel.setVisible(false);
+		Platform.runLater(() -> {
+			Group root = new Group();
+			Scene scene = new Scene(root);
+			mJFXPanel.setScene(scene);
+		});
+
+		mFileChooser = new FileChooser();
+		mFileChooser.getExtensionFilters().add(
+				new FileChooser.ExtensionFilter("KSP Save or Craft files", "*.sfs", "*.txt", "*.craft", "*.cfg")
+		);
+
+		mDirectoryChooser = new DirectoryChooser();
+		mDirectoryChooser.setTitle("KSP Folder...");
+
+		updateChoosersInitDirectory();
 		
 			
 		// ################################## Temp Nodes ##################################
@@ -217,26 +225,28 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 			return;
 		}
 		else if (source == mFileSettingsItem) {
-			mFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-			int returnVal = mFileChooser.showOpenDialog(this);
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				Settings.setString(Settings.PREF_KSP_DIR, mFileChooser.getSelectedFile().getAbsolutePath());
-			}
+			Platform.runLater(() -> {
+				final File directory = mDirectoryChooser.showDialog(mJFXPanel.getScene().getWindow());
+				if (directory != null) {
+					Settings.setString(Settings.PREF_KSP_DIR, directory.getAbsolutePath());
+					updateChoosersInitDirectory();
+				}
+			});
 			return;
 		}
 		else if (source == mFileOpenSFSItem) {
-			loadFile(true);
+			Platform.runLater(() -> loadFile(true));
 			return;
 		}
 		else if (source == mFileOpenOtherItem) {
-			loadFile(false);
+			Platform.runLater(() -> loadFile(false));
 			return;
 		}
 		
 		NodeTreeWindow tw = getCurrentTreeWindow();
 		if(tw!=null){
 			if (source == mFileSaveItem) {
-				showSaveDialog(tw.getNodeTree());
+				Platform.runLater(() -> showSaveDialog(tw.getNodeTree()));
 			}
 			else if (source == mEditSearchItem) {
 				tw.getNodeTree().doSearch();
@@ -246,17 +256,20 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 			JOptionPane.showMessageDialog(this, "Please select a tree window first!", "Error", JOptionPane.WARNING_MESSAGE);
 		}
 	}
-	
+
+	private void updateChoosersInitDirectory() {
+		mFileChooser.setInitialDirectory(new File(Settings.getString(Settings.PREF_KSP_DIR, System.getProperty("user.home"))));
+		mDirectoryChooser.setInitialDirectory(new File(Settings.getString(Settings.PREF_KSP_DIR, System.getProperty("user.home"))));
+	}
+
 	protected NodeTreeWindow getCurrentTreeWindow(){
 		return (NodeTreeWindow) mTabPane.getSelectedComponent();
 	}
 	
 	protected void loadFile(boolean hasRoot){
-		
-		mFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		int returnVal = mFileChooser.showOpenDialog(this);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File f = mFileChooser.getSelectedFile();
+
+		File f = mFileChooser.showOpenDialog(mJFXPanel.getScene().getWindow());
+		if (f != null) {
 			Logger.log("You chose to open this file: " + f.getName());
 			for (NodeTreeWindow tw : mTreeWindows){
 				try {
@@ -285,10 +298,8 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 
 	protected void showSaveDialog(NodeTree tw){
 		if(tw!=null){
-			mFileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-			int returnVal = mFileChooser.showSaveDialog(this);
-			if (returnVal == JFileChooser.APPROVE_OPTION) {
-				File f = mFileChooser.getSelectedFile();
+			File f = mFileChooser.showOpenDialog(mJFXPanel.getScene().getWindow());
+			if (f != null) {
 				Logger.log("You chose to save this file: " + f.getName());
 				if(f.exists()){
 					int res = JOptionPane.showConfirmDialog(this, "File exists! Do you want to overwrite the file?", "File exists!", JOptionPane.YES_NO_CANCEL_OPTION);
@@ -327,11 +338,11 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 				Logger.setFileEnabled(false);
 			}
 			else{
-				mFileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				int returnVal = mFileChooser.showSaveDialog(this);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
+				// Only file selection supported now!
+				File selected = mFileChooser.showSaveDialog(mJFXPanel.getScene().getWindow());
+				if (selected != null) {
 					try {
-						Logger.setLogFile(mFileChooser.getSelectedFile());
+						Logger.setLogFile(selected);
 						Logger.setFileEnabled(true);
 					} catch (FileNotFoundException e1) {
 						JOptionPane.showMessageDialog(this, "Error creating logfile!\n"+e1.getLocalizedMessage(), "Error", JOptionPane.ERROR_MESSAGE);

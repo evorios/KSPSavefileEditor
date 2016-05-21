@@ -24,9 +24,6 @@ public class TreeBaseNode {
 	}
 
 	public boolean hasParent(){
-		if(mParentNode!=null){
-			return true;
-		}
-		return false;
+		return mParentNode != null;
 	}
 }

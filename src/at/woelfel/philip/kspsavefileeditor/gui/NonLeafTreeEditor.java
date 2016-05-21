@@ -24,7 +24,7 @@ class NonLeafTreeEditor extends DefaultTreeCellEditor {
 			MouseEvent mouseEvent = (MouseEvent) event;
 			JTree tree = (JTree) event.getSource();
 			TreePath path = tree.getPathForLocation(mouseEvent.getX(), mouseEvent.getY());
-			return path.getLastPathComponent() instanceof Node;
+			return path != null && path.getLastPathComponent() instanceof Node;
 		}
 		return false;
 	}

@@ -3,8 +3,6 @@ package at.woelfel.philip.kspsavefileeditor.gui;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -60,14 +58,10 @@ public class CloseableTab extends JPanel {
         closeButton.setBorderPainted(false);
         closeButton.setRolloverEnabled(true);
         closeButton.addMouseListener(buttonMouseListener);
-		closeButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				int i = mTabPane.indexOfTabComponent(CloseableTab.this);
-				if (i != -1) {
-					mMainGui.removeTab(i);
-				}
+		closeButton.addActionListener(e -> {
+			int i = mTabPane.indexOfTabComponent(CloseableTab.this);
+			if (i != -1) {
+				mMainGui.removeTab(i);
 			}
 		});
 		add(closeButton);

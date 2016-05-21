@@ -172,9 +172,6 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 		
 		//add(nodeTreeJSP,c);
 		//add(entryTableJSP, c);
-		
-		
-		setVisible(true);
 	}
 
 	public void addTreeWindow(Node n){

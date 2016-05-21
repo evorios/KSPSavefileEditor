@@ -59,13 +59,9 @@ public class ProgressScreen extends JFrame {
 	}
 	
 	public static void updateProgressBar(final int progressBarValue){
-		SwingUtilities.invokeLater(new Runnable() {
-			
-			@Override
-			public void run() {
-				if(mProgressBar!=null){
-					mProgressBar.setValue(progressBarValue);
-				}
+		SwingUtilities.invokeLater(() -> {
+			if(mProgressBar!=null){
+				mProgressBar.setValue(progressBarValue);
 			}
 		});
 	}

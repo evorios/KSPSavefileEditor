@@ -22,8 +22,8 @@ public class Node extends TreeBaseNode {
 	public Node(String name, Node parent) {
 		mParentNode = parent;
 		mNodeName = name;
-		mEntries = new ArrayList<Entry>();
-		mSubNodes = new ArrayList<Node>();
+		mEntries = new ArrayList<>();
+		mSubNodes = new ArrayList<>();
 	}
 
 		
@@ -121,10 +121,7 @@ public class Node extends TreeBaseNode {
 	}
 	
 	public boolean hasSubNodes(){
-		if(mSubNodes == null || mSubNodes.size() == 0){
-			return false;
-		}
-		return true;
+		return !(mSubNodes == null || mSubNodes.isEmpty());
 	}
 	
 	
@@ -141,7 +138,7 @@ public class Node extends TreeBaseNode {
 	public ArrayList<Object> getPathToRoot(){
 		
 		if(mParentNode==null){
-			ArrayList<Object> path = new ArrayList<Object>();
+			ArrayList<Object> path = new ArrayList<>();
 			path.add(this);
 			return path;
 		}
@@ -218,7 +215,7 @@ public class Node extends TreeBaseNode {
 	}
 	
 	public TreePath[] multiSearch(String search){
-		ArrayList<TreePath> paths = new ArrayList<TreePath>();
+		ArrayList<TreePath> paths = new ArrayList<>();
 		multiSearchInternal(search, paths);
 		TreePath[] results = new TreePath[paths.size()];
 		for (int i=0;i<paths.size();i++) {
@@ -229,7 +226,7 @@ public class Node extends TreeBaseNode {
 	
 	private ArrayList<TreePath> multiSearchInternal(String search,ArrayList<TreePath>  results){
 		if(results==null){
-			results = new ArrayList<TreePath>();
+			results = new ArrayList<>();
 		}
 		// check yourself
 		if(getNodeName().contains(search)){

@@ -19,7 +19,7 @@ public class NodeTreeModel implements TreeModel, TreeWillExpandListener {
 	
 	public NodeTreeModel(Node rootNode) {
 		mRootNode = rootNode;
-		mTreeListener = new ArrayList<TreeModelListener>();
+		mTreeListener = new ArrayList<>();
 	}
 	
 

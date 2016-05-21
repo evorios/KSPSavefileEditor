@@ -50,9 +50,7 @@ public class Entry extends TreeBaseNode{
 
 	
 	public boolean search(String search){
-		if(getKey().toLowerCase().contains(search.toLowerCase()) || getValue().toLowerCase().contains(search.toLowerCase())){
-			return true;
-		}
-		return false;
+		final String slc = search.toLowerCase();
+		return getKey().toLowerCase().contains(slc) || getValue().toLowerCase().contains(slc);
 	}
 }

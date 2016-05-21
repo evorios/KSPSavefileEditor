@@ -12,7 +12,7 @@ public class NodeTableModel extends AbstractTableModel{
 	private ArrayList<ChangeListener> mChangeListener;
 	
 	public NodeTableModel() {
-		mChangeListener = new ArrayList<ChangeListener>();
+		mChangeListener = new ArrayList<>();
 	}
 	
 

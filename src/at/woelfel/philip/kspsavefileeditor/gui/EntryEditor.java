@@ -37,7 +37,7 @@ public class EntryEditor extends JFrame implements ActionListener {
 	
 	public EntryEditor() {
 		
-		mChangeListener = new ArrayList<ChangeListener>();
+		mChangeListener = new ArrayList<>();
 		
 		setTitle("Entry Editor");
 		setSize(400, 150);

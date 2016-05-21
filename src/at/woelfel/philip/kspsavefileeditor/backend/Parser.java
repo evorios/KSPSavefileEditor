@@ -24,7 +24,7 @@ public class Parser {
 	 */
 	public Parser(String content, boolean isContent) {
 		if(content != null && content.length()>0){
-			mLines = new ArrayList<String>(Arrays.asList(content.split("\\r?\\n")));
+			mLines = new ArrayList<>(Arrays.asList(content.split("\\r?\\n")));
 			mLineCount = mLines.size();
 		}
 	}
@@ -43,7 +43,7 @@ public class Parser {
 		}
 		if (br != null) {
 			try {
-				mLines = new ArrayList<String>();
+				mLines = new ArrayList<>();
 				String line = "";
 				while ((line = br.readLine()) != null) {
 					mLines.add(line);
@@ -64,7 +64,7 @@ public class Parser {
 		 * 
 		 * only root level is different, if node is found on root level can be parsed using normal parseLines
 		 */
-		ArrayList<TreeBaseNode> data = new ArrayList<TreeBaseNode>();
+		ArrayList<TreeBaseNode> data = new ArrayList<>();
 		for (; mCurrentLine < mLineCount; mCurrentLine++) {
 			
 			if(mCurrentLine%1000==0){

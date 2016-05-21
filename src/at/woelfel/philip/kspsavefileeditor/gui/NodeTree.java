@@ -116,7 +116,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 
 	/**
 	 * Loads and parses the File and shows it in this tree.
-	 * @param f
+	 * @param f source file to load
 	 * @param hasRoot if the file has a root node or not
 	 */
 	public void load(File f, final boolean hasRoot) {
@@ -124,17 +124,14 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		final Parser p = new Parser(f);
 		ProgressScreen.showProgress("Parsing savefile...", this);
 		ProgressScreen.updateProgressBar(0);
-		Thread th = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					setRootNode(p.parse(hasRoot));
-				} catch (Exception e) {
-					e.printStackTrace();
-					JOptionPane.showMessageDialog(null, "Error parsing file!\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				}
-				ProgressScreen.hideProgress();
+		Thread th = new Thread(() -> {
+			try {
+				setRootNode(p.parse(hasRoot));
+			} catch (Exception e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Error parsing file!\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 			}
+			ProgressScreen.hideProgress();
 		});
 		th.start();
 	}
@@ -150,32 +147,29 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 
 	/**
 	 * Saves the current tree to the File.
-	 * @param f
+	 * @param f destination file
 	 */
 	public void saveAs(final File f) {
 		ProgressScreen.showProgress("Saving file...", this);
 		ProgressScreen.updateProgressBar(0);
-		Thread th = new Thread(new Runnable() {
-			@Override
-			public void run() {
+		Thread th = new Thread(() -> {
 
-				String content = mRootNode.print(0);
-				try {
-					FileWriter fw = new FileWriter(f);
-					ProgressScreen.updateProgressBar(20);
-					fw.write(content);
-					ProgressScreen.updateProgressBar(50);
-					fw.flush();
-					ProgressScreen.updateProgressBar(85);
-					fw.close();
-					ProgressScreen.updateProgressBar(95);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-					System.err.println("Couldn't write file!\n" + e1);
-				}
-				ProgressScreen.hideProgress();
-
+			String content = mRootNode.print(0);
+			try {
+				FileWriter fw = new FileWriter(f);
+				ProgressScreen.updateProgressBar(20);
+				fw.write(content);
+				ProgressScreen.updateProgressBar(50);
+				fw.flush();
+				ProgressScreen.updateProgressBar(85);
+				fw.close();
+				ProgressScreen.updateProgressBar(95);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+				System.err.println("Couldn't write file!\n" + e1);
 			}
+			ProgressScreen.hideProgress();
+
 		});
 		th.start();
 		
@@ -184,17 +178,16 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 	
 	
 	public ArrayList<TreePath> search(TreePath[] paths, String search){
-		ArrayList<Node> nodesToSearch = new ArrayList<Node>();
+		ArrayList<Node> nodesToSearch = new ArrayList<>();
 		
 		// get the nodes we want to search through
 		// TODO: don't search subnodes of already selected nodes --> duplicate results!
-		for (int i = 0; i < paths.length; i++) {
-			Object lpc = paths[i].getLastPathComponent();
-			if(lpc instanceof Node){
-				nodesToSearch.add((Node)lpc);
-			}
-			else if(lpc instanceof Entry){
-				nodesToSearch.add(((Entry)lpc).getParentNode());
+		for (TreePath path : paths) {
+			Object lpc = path.getLastPathComponent();
+			if (lpc instanceof Node) {
+				nodesToSearch.add((Node) lpc);
+			} else if (lpc instanceof Entry) {
+				nodesToSearch.add(((Entry) lpc).getParentNode());
 			}
 		}
 		
@@ -205,7 +198,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		
 		if(search != null && search.length() != 0 && nodes != null && nodes.size() > 0){
 			TreePath[] tp = null;
-			ArrayList<TreePath> results = new ArrayList<TreePath>();
+			ArrayList<TreePath> results = new ArrayList<>();
 			for (Node node : nodes) {
 				tp = node.multiSearch(search);
 				if(tp!=null && tp.length>0){
@@ -222,14 +215,14 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		String search = JOptionPane.showInputDialog(null, "Please enter search term", "Search", JOptionPane.QUESTION_MESSAGE);
 		if(search != null && search.length() != 0){
 			TreePath[] paths = getSelectionPaths(); // get all selected paths
-			ArrayList<TreePath> results = new ArrayList<TreePath>();
+			ArrayList<TreePath> results = new ArrayList<>();
 			if(paths != null && paths.length>0){
 				// search from selection
 				results = search(paths, search);
 			}
 			else{
 				// global search
-				ArrayList<Node> tmp = new ArrayList<Node>(1);
+				ArrayList<Node> tmp = new ArrayList<>(1);
 				tmp.add(mRootNode);
 				results = search(tmp, search);
 			}
@@ -481,13 +474,12 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		int yesno = JOptionPane.showConfirmDialog(null, "Do you really want to remove duplicate Entries from within the selected Node?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (yesno == JOptionPane.YES_OPTION) {
 			TreePath[] paths = getSelectionPaths();
-			
-			for (int i = 0; i < paths.length; i++) {
-				TreePath path = paths[i];
+
+			if (paths != null) for (TreePath path : paths) {
 				Object selection = path.getLastPathComponent();
-				
+
 				if (selection instanceof Node) {
-					removeDuplicateEntriesFromNode((Node)selection);
+					removeDuplicateEntriesFromNode((Node) selection);
 				}
 			}
 		}
@@ -499,10 +491,10 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		}
 		
 		if (parent.getEntryCount() > 0) {
-			HashSet<String> unique = new HashSet<String>();
+			HashSet<String> unique = new HashSet<>();
 			
 			ArrayList<Entry> entries = parent.getEntries();
-			for (Entry entry : new ArrayList<Entry>(entries)) {
+			for (Entry entry : new ArrayList<>(entries)) {
 				if (unique.contains(entry.toString())) {
 					Logger.log("Removing duplicate entry " + entry.toString());
 					parent.removeEntry(entry);
@@ -520,8 +512,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		int yesno = JOptionPane.showConfirmDialog(null, "Do you really want to delete this Node/Entry?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (yesno == JOptionPane.YES_OPTION) {
 			TreePath[] paths = getSelectionPaths();
-			for (int i = 0; i < paths.length; i++) {
-				TreePath path = paths[i];
+			if (paths != null) for (TreePath path : paths) {
 				Object selection = path.getLastPathComponent();
 				int pc = path.getPathCount();
 				if (pc >= 2) { // we got at least two nodes --> remove from parent
@@ -530,15 +521,13 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 						parent.removeEntry((Entry) selection);
 						onEntryRemoved((Entry) selection);
 						selection = null;
-					}
-					else if (selection instanceof Node) {
+					} else if (selection instanceof Node) {
 						parent.removeSubNode((Node) selection);
 						onNodeRemoved((Node) selection);
 						selection = null;
 					}
-				}
-				else { // we are deleting the root node!
-						// TODO: delete the root node?
+				} else { // we are deleting the root node!
+					// TODO: delete the root node?
 				}
 			}
 		}
@@ -553,40 +542,37 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 				final Parser p = new Parser(data, true);
 				ProgressScreen.showProgress("Parsing clipboard data...", this);
 				ProgressScreen.updateProgressBar(0);
-				Thread th = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							ArrayList<TreeBaseNode> data = p.parseClipBoard();
-							Object o = path.getLastPathComponent();
-							Node parent = null;
-							if(o instanceof Node){
-								parent = (Node)o;
-							}
-							else if(o instanceof Entry){
-								parent = ((Entry)o).getParentNode();
-							} 
-							if(parent != null){
-								for (TreeBaseNode n : data) {
-									if(n!=null){
-										if(n instanceof Node){
-											parent.addSubNode((Node)n);
-											onNodeAdded((Node)n);
-										}
-										else if(n instanceof Entry){
-											parent.addEntry((Entry)n);
-											onEntryAdded((Entry)n);
-										}
+				Thread th = new Thread(() -> {
+					try {
+						ArrayList<TreeBaseNode> data1 = p.parseClipBoard();
+						Object o = path.getLastPathComponent();
+						Node parent1 = null;
+						if(o instanceof Node){
+							parent1 = (Node)o;
+						}
+						else if(o instanceof Entry){
+							parent1 = ((Entry)o).getParentNode();
+						} 
+						if(parent1 != null){
+							for (TreeBaseNode n : data1) {
+								if(n!=null){
+									if(n instanceof Node){
+										parent1.addSubNode((Node)n);
+										onNodeAdded((Node)n);
+									}
+									else if(n instanceof Entry){
+										parent1.addEntry((Entry)n);
+										onEntryAdded((Entry)n);
 									}
 								}
 							}
-						} catch (Exception e) {
-							ProgressScreen.hideProgress();
-							e.printStackTrace();
-							JOptionPane.showMessageDialog(null, "Error parsing clipboard!\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 						}
+					} catch (Exception e) {
 						ProgressScreen.hideProgress();
+						e.printStackTrace();
+						JOptionPane.showMessageDialog(null, "Error parsing clipboard!\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 					}
+					ProgressScreen.hideProgress();
 				});
 				th.start();
 			}
@@ -602,12 +588,11 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		TreePath[] paths = getSelectionPaths(); // get all selected paths
 		if(paths != null && paths.length>0){
 			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < paths.length; i++) {
-				Object o = paths[i].getLastPathComponent();
-				if(o instanceof Node){
-					sb.append(((Node)o).print(0));
-				}
-				else{
+			for (TreePath path : paths) {
+				Object o = path.getLastPathComponent();
+				if (o instanceof Node) {
+					sb.append(((Node) o).print(0));
+				} else {
 					sb.append(o);
 					sb.append(System.getProperty("line.separator"));
 				}

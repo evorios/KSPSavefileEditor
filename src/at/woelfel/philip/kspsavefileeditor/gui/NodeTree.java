@@ -229,7 +229,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 				Logger.log("Found something: " + results);
 				List<TreePath> foundPaths = toPaths(results);
 				if (foundPaths.size() > 1) {
-					TreePath sel = (TreePath) JOptionPane.showInputDialog(null, "Found multiple results!\nChoose one:", "Multiple Results", JOptionPane.PLAIN_MESSAGE, null, foundPaths.toArray(), null);
+					TreePath sel = (TreePath) JOptionPane.showInputDialog(null, "Found " + foundPaths.size() + " results!\nChoose one:", "Multiple Results", JOptionPane.PLAIN_MESSAGE, null, foundPaths.toArray(), null);
 					setSelectionPath(sel);
 					scrollPathToVisible(sel);
 				}

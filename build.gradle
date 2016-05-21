@@ -20,10 +20,20 @@ sourceSets {
             srcDir 'img'
         }
     }
+    test {
+        java {
+            srcDir 'test/java'
+        }
+        resources {
+            srcDir 'test/resources'
+        }
+    }
 }
 
 dependencies {
     compile files('lib/philips_tools-0.1.jar')
+    testCompile "org.testng:testng:6.9.10"
+    testCompile 'org.assertj:assertj-core:3.4.1'
 }
 
 mainClassName = "at.woelfel.philip.kspsavefileeditor.MainClass"

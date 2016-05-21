@@ -42,11 +42,11 @@ public class NodeEditor extends JFrame implements ActionListener {
 
 	JSplitPane contentPane;
 
-	private JList mSubNodeList;
-	private NodeListModel mSubNodeListModel;
+	private JList<Node> mSubNodeList;
+	private AbstractNodeListModel.NodeListModel mSubNodeListModel;
 
-	private JList mEntryList;
-	private NodeListModel mEntryListModel;
+	private JList<Entry> mEntryList;
+	private AbstractNodeListModel.EntryListModel mEntryListModel;
 
 	private JButton mNodeDeleteButton;
 	private JButton mEntryEditButton;
@@ -63,7 +63,7 @@ public class NodeEditor extends JFrame implements ActionListener {
 
 		createGUI();
 
-		mChangeListener = new ArrayList<ChangeListener>();
+		mChangeListener = new ArrayList<>();
 
 	}
 
@@ -134,8 +134,8 @@ public class NodeEditor extends JFrame implements ActionListener {
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
-		mSubNodeListModel = new NodeListModel(NodeListModel.MODE_SUBNODES);
-		mSubNodeList = new JList(mSubNodeListModel);
+		mSubNodeListModel = new AbstractNodeListModel.NodeListModel();
+		mSubNodeList = new JList<>(mSubNodeListModel);
 		mSubNodeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		leftPanel.add(new JScrollPane(mSubNodeList), gbc);
 
@@ -174,8 +174,8 @@ public class NodeEditor extends JFrame implements ActionListener {
 		gbc.weightx = 1;
 		gbc.weighty = 1;
 		gbc.fill = GridBagConstraints.BOTH;
-		mEntryListModel = new NodeListModel(NodeListModel.MODE_ENTRIES);
-		mEntryList = new JList(mEntryListModel);
+		mEntryListModel = new AbstractNodeListModel.EntryListModel();
+		mEntryList = new JList<>(mEntryListModel);
 		mEntryList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		rightPanel.add(new JScrollPane(mEntryList), gbc);
 
@@ -320,7 +320,7 @@ public class NodeEditor extends JFrame implements ActionListener {
 			if (mEntryList.getSelectedValue() != null) {
 				int yesno = JOptionPane.showConfirmDialog(this, "Do you really want to delete this Entry?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				if (yesno == JOptionPane.YES_OPTION) {
-					Entry entry = (Entry) mEntryList.getSelectedValue();
+					Entry entry = mEntryList.getSelectedValue();
 					mNode.removeEntry(entry);
 					mEntryListModel.nodeUpdated();
 					fireEntryRemoved(entry);
@@ -329,7 +329,7 @@ public class NodeEditor extends JFrame implements ActionListener {
 		}
 		else if (e.getSource() == mEntryEditButton) {
 			if (mEntryList.getSelectedValue() != null) {
-				Entry entry = (Entry) mEntryList.getSelectedValue();
+				Entry entry = mEntryList.getSelectedValue();
 				mEntryEditor.showForEdit(entry);
 			}
 		}
@@ -337,7 +337,7 @@ public class NodeEditor extends JFrame implements ActionListener {
 			if (mSubNodeList.getSelectedValue() != null) {
 				int yesno = JOptionPane.showConfirmDialog(this, "Do you really want to delete this Node?", "Are you sure?", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
 				if (yesno == JOptionPane.YES_OPTION) {
-					Node node = (Node) mSubNodeList.getSelectedValue();
+					Node node = mSubNodeList.getSelectedValue();
 					mNode.removeSubNode(node);
 					mSubNodeListModel.nodeUpdated();
 					fireNodeRemoved(node);

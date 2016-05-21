@@ -89,10 +89,9 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 		mTempNode = new Node("GAME", null);
 		mTempNode.setIcon(Tools.readImage("nodes/game.png"));
 		String[] tmpNodeNames = {"ACTIONGROUPS", "ACTIONS", "CREW", "EDITOR", "EVENTS", "FLIGHTSTATE", "MODULE", "ORBIT", "PART", "PLANETS", "RECRUIT", "ROSTER", "SCIENCE", "TRACKINGSTATION", "VESSEL", "VESSELS/FLAG", "VESSELS/BASE", "VESSELS/PROBE", "VESSELS/SPACEOBJECT"};
-		for (int i = 0; i < tmpNodeNames.length; i++) {
-			String tmpName = tmpNodeNames[i];
+		for (String tmpName : tmpNodeNames) {
 			Node tmpNode = new Node(tmpName, mTempNode);
-			tmpNode.setIcon(Tools.readImage("nodes/" +tmpName.toLowerCase() +".png"));
+			tmpNode.setIcon(Tools.readImage("nodes/" + tmpName.toLowerCase() + ".png"));
 			mTempNode.addSubNode(tmpNode);
 		}
 		/*mRootNode = new Node("Node 0", null);
@@ -120,7 +119,7 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 		*/
 		// ################################## Window ##################################
 		setTitle("KSP Savefile Editor");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
 		//setSize((int)(screen.getWidth()-(screen.getWidth()/10)), (int)(screen.getHeight()-(screen.getHeight()/10)));
 		setSize(screen);
@@ -157,7 +156,7 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 		JScrollPane entryTableJSP = new JScrollPane(mEntryTable);
 		
 		mTabPane = new JTabbedPane();
-		mTreeWindows = new ArrayList<NodeTreeWindow>();
+		mTreeWindows = new ArrayList<>();
 		addTreeWindow(mTempNode);
 		
 		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mTabPane, entryTableJSP);
@@ -374,7 +373,7 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 				sb.append(path[i]);
 			}
 			else{
-				sb.append(path[i]+" > ");
+				sb.append(path[i]).append(" > ");
 			}
 		}
 		
@@ -389,7 +388,6 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 		
 		mTabPane.remove(ntw);
 		mTreeWindows.remove(ntw);
-		ntw = null;
 	}
 
 	

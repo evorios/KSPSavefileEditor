@@ -588,11 +588,11 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 			StringBuilder sb = new StringBuilder();
 			for (TreePath path : paths) {
 				Object o = path.getLastPathComponent();
-				if (o instanceof Node) {
-					sb.append(((Node) o).print(0));
+				if (o instanceof TreeBaseNode) {
+					((TreeBaseNode) o).print(0, sb);
 				} else {
 					sb.append(o);
-					sb.append(System.getProperty("line.separator"));
+					sb.append(System.lineSeparator());
 				}
 			}
 			Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(sb.toString()), null);

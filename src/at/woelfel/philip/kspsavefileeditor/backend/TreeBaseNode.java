@@ -3,7 +3,7 @@ package at.woelfel.philip.kspsavefileeditor.backend;
 /**
  * Dummy base class for Node and Entry.
  */
-public class TreeBaseNode {
+public abstract class TreeBaseNode {
 	private Node mParentNode;
 	private boolean mExpanded = false;
 
@@ -14,11 +14,11 @@ public class TreeBaseNode {
 	public void setExpanded(boolean isExpanded) {
 		mExpanded = isExpanded;
 	}
-	
-	public boolean isExpanded(){
+
+	public boolean isExpanded() {
 		return mExpanded;
 	}
-	
+
 	public Node getParentNode() {
 		return mParentNode;
 	}
@@ -27,7 +27,15 @@ public class TreeBaseNode {
 		this.mParentNode = mParentNode;
 	}
 
-	public boolean hasParent(){
+	public boolean hasParent() {
 		return mParentNode != null;
 	}
+
+	public String print(int tabs) {
+		final StringBuilder builder = new StringBuilder();
+		print(tabs, builder);
+		return builder.toString();
+	}
+
+	public abstract void print(int tabs, StringBuilder sb);
 }

@@ -48,7 +48,11 @@ public class Entry extends TreeBaseNode{
 		return mKey +" = " +mValue;
 	}
 
-	
+	@Override
+	public void print(int tabs, StringBuilder sb) {
+		Node.appendLine(sb, tabs, toString());
+	}
+
 	public boolean search(String search){
 		final String slc = search.toLowerCase();
 		return getKey().toLowerCase().contains(slc) || getValue().toLowerCase().contains(slc);

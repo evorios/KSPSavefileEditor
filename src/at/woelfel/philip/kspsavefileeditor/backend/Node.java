@@ -13,9 +13,7 @@ public class Node extends TreeBaseNode {
 	
 	private ArrayList<Entry> mEntries;
 	private ArrayList<Node> mSubNodes;
-	
-	private String NL = System.getProperty("line.separator");
-	
+
 	private ImageIcon mIcon;
 	
 	
@@ -152,9 +150,8 @@ public class Node extends TreeBaseNode {
 	public TreePath getTreePathToRoot(){
 		return new TreePath(getPathToRoot());
 	}
-	
-	public String print(int tabs){
-		StringBuilder sb = new StringBuilder();
+
+	public void print(int tabs, StringBuilder sb) {
 		
 		if(!"".equals(getNodeName())){ // empty node name means we don't want to save the node name to file (root node for craft or config files)
 			appendLine(sb, tabs, getNodeName());
@@ -167,27 +164,23 @@ public class Node extends TreeBaseNode {
 			appendLine(sb, tabs+1, entry);
 		}
 		for (Node node : getSubNodes()){
-			sb.append(node.print(tabs+1));
+			node.print(tabs + 1, sb);
 		}
 		if(!"".equals(getNodeName())){
 			appendLine(sb, tabs, "}");
 		}
-		
-		return sb.toString();
 	}
 	
-	private void appendLine(StringBuilder sb, int tabs, Object o){
-		sb.append(getTabs(tabs));
+	public static void appendLine(StringBuilder sb, int tabs, Object o){
+		appendTabs(tabs, sb);
 		sb.append(o);
-		sb.append(NL);
+		sb.append(System.lineSeparator());
 	}
 	
-	private String getTabs(int tabs){
-		StringBuilder sb = new StringBuilder();
+	public static void appendTabs(int tabs, StringBuilder sb){
 		for(int i=0;i<tabs;i++){
 			sb.append("\t");
 		}
-		return sb.toString();
 	}
 	
 	public TreePath search(String search){

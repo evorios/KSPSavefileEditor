@@ -1,6 +1,7 @@
 package at.woelfel.philip.kspsavefileeditor.backend;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.tree.TreePath;
@@ -133,15 +134,15 @@ public class Node extends TreeBaseNode {
 		return mNodeName;
 	}
 	
-	public ArrayList<Object> getPathToRoot(){
+	public ArrayList<TreeBaseNode> getPathToRoot(){
 		final Node parent = getParentNode();
 		if(parent==null){
-			ArrayList<Object> path = new ArrayList<>();
+			ArrayList<TreeBaseNode> path = new ArrayList<>();
 			path.add(this);
 			return path;
 		}
 		else{
-			ArrayList<Object> path = parent.getPathToRoot();
+			ArrayList<TreeBaseNode> path = parent.getPathToRoot();
 			path.add(this);
 			return path;
 		}
@@ -161,7 +162,7 @@ public class Node extends TreeBaseNode {
 			tabs--; // decrease tabs so it isn't indented
 		}
 		for (Entry entry : getEntries()) {
-			appendLine(sb, tabs+1, entry);
+			entry.print(tabs + 1, sb);
 		}
 		for (Node node : getSubNodes()){
 			node.print(tabs + 1, sb);
@@ -171,7 +172,7 @@ public class Node extends TreeBaseNode {
 		}
 	}
 	
-	public static void appendLine(StringBuilder sb, int tabs, Object o){
+	public static void appendLine(StringBuilder sb, int tabs, String o){
 		appendTabs(tabs, sb);
 		sb.append(o);
 		sb.append(System.lineSeparator());
@@ -183,59 +184,40 @@ public class Node extends TreeBaseNode {
 		}
 	}
 	
-	public TreePath search(String search){
-		// check yourself
-		if(getNodeName().contains(search)){
-			return getTreePathToRoot();
-		}
-		// check entries
-		for (Entry entry : getEntries()) {
-			if(entry.search(search)){
-				ArrayList<Object> path = getPathToRoot();
-				path.add(entry);
-				return new TreePath(path.toArray());
-			}
-		}
-		// check subnodes
-		for (Node node : getSubNodes()) {
-			TreePath tp = node.search(search);
-			if(tp!=null){ // subnode found something and gives us path to root
-				return tp;
-			}
-		}
-		
-		return null; // we didn't find anything
+	public TreeBaseNode search(String search){
+		final ArrayList<TreeBaseNode> collector = new ArrayList<>(1);
+		doSearch(search, collector, true);
+		if (collector.isEmpty()) return null;
+		else return collector.iterator().next();
 	}
 	
-	public TreePath[] multiSearch(String search){
-		ArrayList<TreePath> paths = new ArrayList<>();
-		multiSearchInternal(search, paths);
-		TreePath[] results = new TreePath[paths.size()];
-		for (int i=0;i<paths.size();i++) {
-			results[i] = paths.get(i);
-		}
-		return results;
+	public List<TreeBaseNode> multiSearch(String search){
+		ArrayList<TreeBaseNode> nodes = new ArrayList<>();
+		doSearch(search, nodes, false);
+		return nodes;
 	}
 	
-	private ArrayList<TreePath> multiSearchInternal(String search,ArrayList<TreePath>  results){
+	private List<TreeBaseNode> doSearch(String search, List<TreeBaseNode> results, boolean stopOnFirst){
 		if(results==null){
 			results = new ArrayList<>();
 		}
 		// check yourself
 		if(getNodeName().contains(search)){
-			results.add(getTreePathToRoot());
+			results.add(this);
+			if (stopOnFirst) return results;
 		}
 		// check entries
 		for (Entry entry : getEntries()) {
 			if(entry.search(search)){
-				ArrayList<Object> path = getPathToRoot();
-				path.add(entry);
-				results.add(new TreePath(path.toArray()));
+				results.add(entry);
+				if (stopOnFirst) return results;
 			}
 		}
 		// check subnodes
-		for (Node node : getSubNodes()) {
-			node.multiSearchInternal(search, results);
+		final ArrayList<Node> subNodes = getSubNodes();
+		if (subNodes != null) for (Node node : subNodes) {
+			node.doSearch(search, results, stopOnFirst);
+			if (stopOnFirst && !results.isEmpty()) return results;
 		}
 		
 		return results;

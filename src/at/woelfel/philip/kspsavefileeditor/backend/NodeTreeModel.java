@@ -121,7 +121,7 @@ public class NodeTreeModel implements TreeModel, TreeWillExpandListener {
 	}
 	
 	private TreeModelEvent getEvent(Node n){
-		ArrayList<Object> path;
+		ArrayList<TreeBaseNode> path;
 		if(n != null){
 			if(n.hasParent()){
 				path = n.getParentNode().getPathToRoot();
@@ -136,7 +136,7 @@ public class NodeTreeModel implements TreeModel, TreeWillExpandListener {
 	}
 	
 	private TreeModelEvent getEvent(Entry e){
-		ArrayList<Object> path = e.getParentNode().getPathToRoot();
+		ArrayList<TreeBaseNode> path = e.getParentNode().getPathToRoot();
 		Logger.log("path: " +path);
 		
 		return new TreeModelEvent(e, path.toArray());

@@ -14,8 +14,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -177,7 +178,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 
 	
 	
-	public ArrayList<TreePath> search(TreePath[] paths, String search){
+	public ArrayList<TreeBaseNode> search(TreePath[] paths, String search){
 		ArrayList<Node> nodesToSearch = new ArrayList<>();
 		
 		// get the nodes we want to search through
@@ -193,17 +194,14 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		
 		return search(nodesToSearch, search);
 	}
-	
-	public ArrayList<TreePath> search(ArrayList<Node> nodes, String search){
+
+	public ArrayList<TreeBaseNode> search(ArrayList<Node> nodes, String search) {
 		
 		if(search != null && search.length() != 0 && nodes != null && nodes.size() > 0){
-			TreePath[] tp;
-			ArrayList<TreePath> results = new ArrayList<>();
+			ArrayList<TreeBaseNode> results = new ArrayList<>();
 			for (Node node : nodes) {
-				tp = node.multiSearch(search);
-				if(tp!=null && tp.length>0){
-					results.addAll(Arrays.asList(tp)); // add found paths to result list
-				}
+				List<TreeBaseNode> tp = node.multiSearch(search);
+				results.addAll(tp); // add found elements to result list
 			}
 			return results;
 		}
@@ -215,7 +213,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		String search = JOptionPane.showInputDialog(null, "Please enter search term", "Search", JOptionPane.QUESTION_MESSAGE);
 		if(search != null && search.length() != 0){
 			TreePath[] paths = getSelectionPaths(); // get all selected paths
-			ArrayList<TreePath> results;
+			ArrayList<TreeBaseNode> results;
 			if(paths != null && paths.length>0){
 				// search from selection
 				results = search(paths, search);
@@ -227,22 +225,38 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 				results = search(tmp, search);
 			}
 			
-			if (results != null && results.size() > 0) {
-				Logger.log("found something: " + results);
-				if (results.size() > 1) {
-					TreePath sel = (TreePath) JOptionPane.showInputDialog(null, "Found multiple results!\nChoose one:", "Multiple Results", JOptionPane.PLAIN_MESSAGE, null, results.toArray(), null);
+			if (results != null && !results.isEmpty()) {
+				Logger.log("Found something: " + results);
+				List<TreePath> foundPaths = toPaths(results);
+				if (foundPaths.size() > 1) {
+					TreePath sel = (TreePath) JOptionPane.showInputDialog(null, "Found multiple results!\nChoose one:", "Multiple Results", JOptionPane.PLAIN_MESSAGE, null, foundPaths.toArray(), null);
 					setSelectionPath(sel);
 					scrollPathToVisible(sel);
 				}
 				else {
-					setSelectionPath(results.get(0));
-					scrollPathToVisible(results.get(0));
+					final TreePath path = foundPaths.iterator().next();
+					setSelectionPath(path);
+					scrollPathToVisible(path);
 				}
 			}
 			else {
 				JOptionPane.showMessageDialog(null, "Didn't find anything!", "No Search Result", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+	}
+
+	private List<TreePath> toPaths(List<TreeBaseNode> results) {
+		return results.stream().map(node -> {
+			if (node instanceof Node) {
+				return ((Node) node).getTreePathToRoot();
+			} else if (node instanceof Entry) {
+				final ArrayList<TreeBaseNode> path = node.getParentNode().getPathToRoot();
+				path.add(node);
+				return new TreePath(path);
+			} else {
+				throw new IllegalStateException();
+			}
+		}).collect(Collectors.toList());
 	}
 
 	public void setSelection(TreePath sel) {

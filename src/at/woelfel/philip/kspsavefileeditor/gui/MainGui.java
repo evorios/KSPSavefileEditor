@@ -95,29 +95,7 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 			tmpNode.setIcon(Tools.readImage("nodes/" + tmpName.toLowerCase() + ".png"));
 			mTempNode.addSubNode(tmpNode);
 		}
-		/*mRootNode = new Node("Node 0", null);
-		for(int i=0;i<10;i++){
-			mRootNode.createEntry("entry1" +((char)(97+i)), "value1" +((char)(97+i)));
-		}
-		for(int i=0;i<10;i++){
-			Node subnode = new Node("Node 0"+i, mRootNode);
-			for(int j=0;j<10;j++){
-				subnode.createEntry("entry0"+i+((char)(97+j)), "value0"+i+((char)(97+j)));
-			}
-			mRootNode.addSubNode(subnode);
 		
-			for(int j=0;j<10;j++){
-				Node subsubnode = new Node("Node0"+i+""+j, subnode);
-				for(int k=0;k<10;k++){
-					subsubnode.createEntry("entry0"+i+""+j+((char)(97+k)), "value0"+i+""+j+((char)(97+k)));
-				}
-				subnode.addSubNode(subsubnode);
-			}
-		}
-		
-		Parser p = new Parser("persistent_small.sfs");
-		mRootNode = p.parse();
-		*/
 		// ################################## Window ##################################
 		setTitle("KSP Savefile Editor");
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

@@ -50,7 +50,7 @@ public class Entry extends TreeBaseNode{
 
 	@Override
 	public void print(int tabs, StringBuilder sb) {
-		Node.appendLine(sb, tabs, toString());
+		Node.appendLine(sb, tabs, mKey + " = " + mValue);
 	}
 
 	public boolean search(String search){

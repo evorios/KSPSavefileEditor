@@ -19,6 +19,7 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.TreePath;
 
+import at.woelfel.philip.kspsavefileeditor.backend.Entry;
 import at.woelfel.philip.kspsavefileeditor.backend.Node;
 import at.woelfel.philip.kspsavefileeditor.backend.NodeTableModel;
 import at.woelfel.philip.kspsavefileeditor.backend.Settings;
@@ -366,11 +367,14 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 		
 		Object[] path = treePath.getPath();
 		for (int i = 0; i < path.length; i++) {
-			if(i==path.length-1){
-				sb.append(path[i]);
+			final Object o = path[i];
+			if (o instanceof Entry) {
+				sb.append(((Entry) o).getKey());
+			} else {
+				sb.append(o);
 			}
-			else{
-				sb.append(path[i]).append(" > ");
+			if (i != path.length - 1) {
+				sb.append(" > ");
 			}
 		}
 		

@@ -1,0 +1,33 @@
+group 'at.woelfel.philip'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'img'
+        }
+    }
+}
+
+dependencies {
+    compile files('lib/philips_tools-0.1.jar')
+}
+
+mainClassName = "at.woelfel.philip.kspsavefileeditor.MainClass"
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "2.13"
+}

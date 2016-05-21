@@ -63,8 +63,9 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 	private JMenuItem mRCCopyMenu;
 	private JMenuItem mRCPasteMenu;
 	private JMenuItem mRCRemoveDuplicatesMenu;
-	
-	
+	private List<SearchListener> mSearchListeners = new ArrayList<>(1);
+
+
 	/**
 	 * @param f The File which should be loaded.
 	 * @param hasRoot If the file that should be loaded has a root node or not (generally save files have one, crafts don't have a root node).
@@ -224,19 +225,11 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 				tmp.add(mRootNode);
 				results = search(tmp, search);
 			}
-			
+
 			if (results != null && !results.isEmpty()) {
 				Logger.log("Found something: " + results);
-				List<TreePath> foundPaths = toPaths(results);
-				if (foundPaths.size() > 1) {
-					TreePath sel = (TreePath) JOptionPane.showInputDialog(null, "Found " + foundPaths.size() + " results!\nChoose one:", "Multiple Results", JOptionPane.PLAIN_MESSAGE, null, foundPaths.toArray(), null);
-					setSelectionPath(sel);
-					scrollPathToVisible(sel);
-				}
-				else {
-					final TreePath path = foundPaths.iterator().next();
-					setSelectionPath(path);
-					scrollPathToVisible(path);
+				for (SearchListener listener : mSearchListeners) {
+					listener.onSearchComplete(search, results);
 				}
 			}
 			else {
@@ -245,7 +238,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		}
 	}
 
-	private List<TreePath> toPaths(List<TreeBaseNode> results) {
+	public static List<TreePath> toPaths(List<TreeBaseNode> results) {
 		return results.stream().map(node -> {
 			if (node instanceof Node) {
 				return ((Node) node).getTreePathToRoot();
@@ -367,8 +360,12 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 			}
 		});
 	}
-	
-	
+
+	public void addSearchListener(SearchListener listener) {
+		mSearchListeners.add(listener);
+	}
+
+
 	class PopupListener extends MouseAdapter {
 		JPopupMenu popup;
 

@@ -1,9 +1,6 @@
 package at.woelfel.philip.kspsavefileeditor.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Toolkit;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -34,9 +31,9 @@ import javafx.stage.*;
 @SuppressWarnings("serial")
 public class MainGui extends JFrame implements ActionListener, ItemListener, TreeSelectionListener{
 	/*
-	 * TODO: search & replace:
-	 * Show found elements with checkboxes so user could select what elements should be replaced
-	 */
+		 * TODO: search & replace:
+		 * Show found elements with checkboxes so user could select what elements should be replaced
+		 */
 	private FileChooser mFileChooser;
 	private DirectoryChooser mDirectoryChooser;
 
@@ -46,7 +43,8 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 	private JTable mEntryTable;
 	private ArrayList<NodeTreeWindow> mTreeWindows;
 	private JLabel mPathLabel;
-	
+
+	private final SearchResultPanel mSearchResultPanel;
 	
 	private JMenuItem mFileOpenSFSItem;
 	private JMenuItem mFileOpenOtherItem;
@@ -60,8 +58,9 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 	private JCheckBoxMenuItem mAboutFileDebugItem;
 	
 	private NodeTableModel mNodeTableModel;
+	private final JSplitPane mEntryTableSearchSplit;
 
-	
+
 	public MainGui() {
 		Logger.setEnabled(false);
 
@@ -138,11 +137,17 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 		mTreeWindows = new ArrayList<>();
 		addTreeWindow(mTempNode);
 		
-		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mTabPane, entryTableJSP);
+		mSearchResultPanel = new SearchResultPanel(this);
+
+		mEntryTableSearchSplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, entryTableJSP, null);
+		mEntryTableSearchSplit.setDividerLocation(0.5);
+		
+		JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, mTabPane, mEntryTableSearchSplit);
 		splitPane.setDividerLocation((screen.height/3)*2); // set to 2/3 of screen height
 		add(splitPane, BorderLayout.CENTER);
-		
-		
+
+
+
 		mPathLabel = new JLabel("Path");
 		JPanel pathPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		pathPanel.add(mPathLabel);
@@ -168,6 +173,7 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 	}
 	
 	public void addTreeWindow(NodeTree nt, String tabName){
+		nt.addSearchListener(mSearchResultPanel);
 		nt.addTreeSelectionListener(this);
 		
 		NodeTreeWindow tmpNTW = new NodeTreeWindow(nt);
@@ -369,7 +375,13 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 		mTreeWindows.remove(ntw);
 	}
 
+	public void showSearchResults() {
+		mEntryTableSearchSplit.setRightComponent(mSearchResultPanel);
+	}
 	
+	public void hideSearchResults() {
+		mEntryTableSearchSplit.setRightComponent(null);
+	}
 	
 	
 

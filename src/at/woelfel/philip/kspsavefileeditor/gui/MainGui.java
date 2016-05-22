@@ -367,7 +367,9 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 
 	public void removeTab(int i) {
 		NodeTreeWindow ntw = (NodeTreeWindow)mTabPane.getComponentAt(i);
-		ntw.getNodeTree().removeTreeSelectionListener(this);
+		final NodeTree tree = ntw.getNodeTree();
+		mSearchResultPanel.removeElementsWithHandler(tree);
+		tree.removeTreeSelectionListener(this);
 		ntw.cleanup();
 		ntw.setNodeTree(new NodeTree(null, mNodeTableModel));
 		

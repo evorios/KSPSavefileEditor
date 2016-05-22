@@ -149,7 +149,7 @@ public class Node extends TreeBaseNode {
 	}
 	
 	public TreePath getTreePathToRoot(){
-		return new TreePath(getPathToRoot());
+		return new TreePath(getPathToRoot().toArray());
 	}
 
 	public void print(int tabs, StringBuilder sb) {

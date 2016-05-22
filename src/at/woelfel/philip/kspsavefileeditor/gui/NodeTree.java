@@ -42,7 +42,7 @@ import at.woelfel.philip.tools.Logger;
 import at.woelfel.philip.tools.Tools;
 
 @SuppressWarnings("serial")
-public class NodeTree extends JTree implements TreeSelectionListener, ChangeListener, ActionListener {
+public class NodeTree extends JTree implements TreeSelectionListener, ChangeListener, ActionListener, GoToHandler {
 
 	// private JTree mNodeTree;
 	private NodeTreeModel mNodeTreeModel;
@@ -229,7 +229,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 			if (results != null && !results.isEmpty()) {
 				Logger.log("Found something: " + results);
 				for (SearchListener listener : mSearchListeners) {
-					listener.onSearchComplete(search, results);
+					listener.onSearchComplete(search, results, this);
 				}
 			}
 			else {
@@ -238,18 +238,16 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 		}
 	}
 
-	public static List<TreePath> toPaths(List<TreeBaseNode> results) {
-		return results.stream().map(node -> {
-			if (node instanceof Node) {
-				return ((Node) node).getTreePathToRoot();
-			} else if (node instanceof Entry) {
-				final ArrayList<TreeBaseNode> path = node.getParentNode().getPathToRoot();
-				path.add(node);
-				return new TreePath(path);
-			} else {
-				throw new IllegalStateException();
-			}
-		}).collect(Collectors.toList());
+	public static TreePath toPath(TreeBaseNode node) {
+		if (node instanceof Node) {
+			return ((Node) node).getTreePathToRoot();
+		} else if (node instanceof Entry) {
+			final ArrayList<TreeBaseNode> path = node.getParentNode().getPathToRoot();
+			path.add(node);
+			return new TreePath(path.toArray());
+		} else {
+			throw new IllegalStateException();
+		}
 	}
 
 	public void setSelection(TreePath sel) {
@@ -363,6 +361,15 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 
 	public void addSearchListener(SearchListener listener) {
 		mSearchListeners.add(listener);
+	}
+
+	@Override
+	public void navigate(TreeBaseNode node) {
+		if (node == null) return;
+		final TreePath path = toPath(node);
+		if (path == null) return;
+		setSelectionPath(path);
+		scrollPathToVisible(path);
 	}
 
 

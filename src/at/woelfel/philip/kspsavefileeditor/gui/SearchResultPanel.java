@@ -61,7 +61,7 @@ private final JList<ListElement> mResultList;
 
 	private void navigate(ListElement element) {
 		if (element == null) return;
-		element.mHandler.navigate(element.mNode);
+		element.navigate();
 	}
 
 	public void onSearchComplete(String term, List<TreeBaseNode> found, GoToHandler handler) {
@@ -120,17 +120,21 @@ private final JList<ListElement> mResultList;
 	private static class ListElement {
 		private final TreeBaseNode mNode;
 		private final GoToHandler mHandler;
-		private final TreePath mString;
+		private final String mString;
 
 		public ListElement(TreeBaseNode node, GoToHandler handler) {
 			mNode = node;
 			mHandler = handler;
-			mString = NodeTree.toPath(node);
+			mString = MainGui.pathToString(NodeTree.toPath(node));
 		}
 
 		@Override
 		public String toString() {
-			return mString.toString();
+			return mString;
+		}
+
+		public void navigate() {
+			mHandler.navigate(mNode);
 		}
 	}
 }

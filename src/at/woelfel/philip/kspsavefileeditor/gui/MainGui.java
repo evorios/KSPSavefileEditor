@@ -251,6 +251,9 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 
 		File f = mFileChooser.showOpenDialog(mJFXPanel.getScene().getWindow());
 		if (f != null) {
+			if (f.exists() && f.getParentFile().isDirectory()) {
+				mFileChooser.setInitialDirectory(f.getParentFile());
+			}
 			Logger.log("You chose to open this file: " + f.getName());
 			for (NodeTreeWindow tw : mTreeWindows){
 				try {
@@ -279,7 +282,7 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 
 	protected void showSaveDialog(NodeTree tw){
 		if(tw!=null){
-			File f = mFileChooser.showOpenDialog(mJFXPanel.getScene().getWindow());
+			File f = mFileChooser.showSaveDialog(mJFXPanel.getScene().getWindow());
 			if (f != null) {
 				Logger.log("You chose to save this file: " + f.getName());
 				if(f.exists()){
@@ -345,9 +348,8 @@ public class MainGui extends JFrame implements ActionListener, ItemListener, Tre
 		}
 	}
 	
-	public String pathToString(TreePath treePath){
+	public static String pathToString(TreePath treePath){
 		StringBuilder sb = new StringBuilder();
-		// sb.append("Path: ");
 		
 		Object[] path = treePath.getPath();
 		for (int i = 0; i < path.length; i++) {

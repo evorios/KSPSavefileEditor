@@ -12,6 +12,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.BufferedWriter;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -158,7 +162,7 @@ public class NodeTree extends JTree implements TreeSelectionListener, ChangeList
 
 			String content = mRootNode.print(0);
 			try {
-				FileWriter fw = new FileWriter(f);
+				BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f, true), StandardCharsets.UTF_8));
 				ProgressScreen.updateProgressBar(20);
 				fw.write(content);
 				ProgressScreen.updateProgressBar(50);
